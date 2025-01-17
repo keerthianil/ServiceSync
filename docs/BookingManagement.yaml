@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  title: Booking Management API
+  description: API for managing booking operations in ServiceSync
+  version: 1.0.0
+paths:
+  /api/bookings:
+    post:
+      summary: Create booking
+      description: Create a new booking for a specified service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input data
+        '500':
+          description: Server error
+
+  /api/bookings/{bookingId}:
+    get:
+      summary: Get booking details
+      description: Retrieve details of a specific booking.
+      parameters:
+        - in: path
+          name: bookingId
+          required: true
+          schema:
+            type: string
+          description: The ID of the booking
+      responses:
+        '200':
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Booking not found
+        '500':
+          description: Server error
+
+  /api/bookings/{bookingId}/status:
+    put:
+      summary: Update booking status
+      description: Update the status of a specific booking (e.g., confirmed, canceled).
+      parameters:
+        - in: path
+          name: bookingId
+          required: true
+          schema:
+            type: string
+          description: The ID of the booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingStatusUpdate'
+      responses:
+        '200':
+          description: Booking status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid status update
+        '404':
+          description: Booking not found
+        '500':
+          description: Server error
+
+  /api/users/{userId}/bookings:
+    get:
+      summary: Get user's bookings
+      description: Retrieve a list of bookings made by a specific user.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The ID of the user
+      responses:
+        '200':
+          description: List of user's bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    Booking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          example: "7d9f3a2c-bb7b-4f3a-912d-9c06d9d3a5b4"
+        userId:
+          type: string
+          example: "f3b8b195-8f7c-4f3a-8cbb-b6f9a5d0b6a1"
+        serviceId:
+          type: string
+          example: "60b6a3cd5f9b1e0017d2b6d4"
+        dateTime:
+          type: string
+          format: date-time
+          example: "2024-12-01T10:30:00Z"
+        status:
+          type: string
+          example: "confirmed"
+        totalPrice:
+          type: number
+          format: float
+          example: 49.99
+        address:
+          $ref: '#/components/schemas/Address'
+
+    BookingCreate:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "f3b8b195-8f7c-4f3a-8cbb-b6f9a5d0b6a1"
+        serviceId:
+          type: string
+          example: "60b6a3cd5f9b1e0017d2b6d4"
+        dateTime:
+          type: string
+          format: date-time
+          example: "2024-12-01T10:30:00Z"
+        address:
+          $ref: '#/components/schemas/Address'
+
+    BookingStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "canceled"
+          enum:
+            - pending
+            - confirmed
+            - completed
+            - canceled
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "123 Main St"
+        city:
+          type: string
+          example: "Springfield"
+        state:
+          type: string
+          example: "IL"
+        zipCode:
+          type: string
+          example: "62701"

@@ -1,0 +1,168 @@
+openapi: 3.0.0
+info:
+  title: ServiceSync Payment Management API
+  description: API for managing payment operations in ServiceSync
+  version: 1.0.0
+paths:
+  /api/payments:
+    post:
+      summary: Process payment
+      description: Process a new payment for a booking.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentProcess"
+      responses:
+        "201":
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Invalid input data
+        "500":
+          description: Server error
+
+  /api/payments/{paymentId}:
+    get:
+      summary: Get payment details
+      description: Retrieve details of a specific payment.
+      parameters:
+        - in: path
+          name: paymentId
+          required: true
+          schema:
+            type: string
+          description: The ID of the payment
+      responses:
+        "200":
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: Payment not found
+        "500":
+          description: Server error
+
+  /api/payments/{paymentId}/refund:
+    post:
+      summary: Process refund
+      description: Process a refund for a specific payment.
+      parameters:
+        - in: path
+          name: paymentId
+          required: true
+          schema:
+            type: string
+          description: The ID of the payment to be refunded
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundRequest"
+      responses:
+        "200":
+          description: Refund processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        "400":
+          description: Invalid refund request
+        "404":
+          description: Payment not found
+        "500":
+          description: Server error
+
+components:
+  schemas:
+    Payment:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          example: "a9f3c0d7-4c7d-45e9-987d-8dff9c89f9b4"
+        bookingId:
+          type: string
+          example: "7d9f3a2c-bb7b-4f3a-912d-9c06d9d3a5b4"
+        userId:
+          type: string
+          example: "f3b8b195-8f7c-4f3a-8cbb-b6f9a5d0b6a1"
+        amount:
+          type: number
+          format: float
+          example: 49.99
+        currency:
+          type: string
+          example: "USD"
+        status:
+          type: string
+          example: "completed"
+        paymentMethod:
+          type: string
+          example: "credit_card"
+        transactionDate:
+          type: string
+          format: date-time
+          example: "2024-12-01T10:30:00Z"
+
+    PaymentProcess:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          example: "7d9f3a2c-bb7b-4f3a-912d-9c06d9d3a5b4"
+        userId:
+          type: string
+          example: "f3b8b195-8f7c-4f3a-8cbb-b6f9a5d0b6a1"
+        amount:
+          type: number
+          format: float
+          example: 49.99
+        currency:
+          type: string
+          example: "USD"
+        paymentMethod:
+          type: string
+          example: "credit_card"
+
+    RefundRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: "Customer cancellation"
+        amount:
+          type: number
+          format: float
+          example: 49.99
+
+    Refund:
+      type: object
+      properties:
+        refundId:
+          type: string
+          example: "b2c8b3d2-3a7f-44b9-8dd1-7c0edb3c6a7f"
+        paymentId:
+          type: string
+          example: "a9f3c0d7-4c7d-45e9-987d-8dff9c89f9b4"
+        amount:
+          type: number
+          format: float
+          example: 49.99
+        currency:
+          type: string
+          example: "USD"
+        status:
+          type: string
+          example: "processed"
+        processedDate:
+          type: string
+          format: date-time
+          example: "2024-12-02T12:00:00Z"

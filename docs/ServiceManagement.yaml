@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Service Management API
+  description: API for managing services in ServiceSync
+  version: 1.0.0
+paths:
+  /api/services:
+    get:
+      summary: List all services
+      description: Retrieve a list of all available services.
+      responses:
+        '200':
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        '500':
+          description: Server error
+
+    post:
+      summary: Add new service
+      description: Add a new service to the list.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Service'
+      responses:
+        '201':
+          description: Service added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          description: Invalid input data
+        '500':
+          description: Server error
+
+  /api/services/{categoryId}:
+    get:
+      summary: List services by category
+      description: Retrieve services filtered by a specific category.
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+          description: The ID of the service category
+      responses:
+        '200':
+          description: List of services in the specified category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+        '404':
+          description: Category not found
+        '500':
+          description: Server error
+
+  /api/services/{serviceId}:
+    get:
+      summary: Get service details
+      description: Retrieve details for a specific service.
+      parameters:
+        - in: path
+          name: serviceId
+          required: true
+          schema:
+            type: string
+          description: The ID of the service
+      responses:
+        '200':
+          description: Service details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '404':
+          description: Service not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "60b6a3cd5f9b1e0017d2b6d4"
+        categoryId:
+          type: string
+          example: "60b6a3cd5f9b1e0017d2b6c1"
+        name:
+          type: string
+          example: "Home Cleaning"
+        description:
+          type: string
+          example: "Professional cleaning service for your home."
+        price:
+          type: number
+          format: float
+          example: 49.99
+        duration:
+          type: string
+          example: "2 hours"
+        availability:
+          type: boolean
+          example: true
+        rating:
+          type: number
+          format: float
+          example: 4.5

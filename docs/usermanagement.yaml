@@ -1,0 +1,210 @@
+user openapi: 3.0.0
+info:
+  title: ServiceSync User Management API
+  description: API for managing user-related operations in ServiceSync
+  version: 1.0.0
+
+paths:
+  /api/users:
+    post:
+      summary: Register a new user
+      description: Register a new user account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input data
+        '500':
+          description: Server error
+
+  /api/auth/login:
+    post:
+      summary: User login
+      description: Authenticates the user and returns a token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        '401':
+          description: Unauthorized, invalid credentials
+        '500':
+          description: Server error
+
+  /api/users/{userId}:
+    get:
+      summary: Get user profile
+      description: Retrieve profile details of a specific user.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The ID of the user
+      responses:
+        '200':
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+    put:
+      summary: Update user profile
+      description: Update the profile information of a specific user.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The ID of the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input data
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+    delete:
+      summary: Delete user profile
+      description: Delete a specific user's profile
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to delete
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "f3b8b195-8f7c-4f3a-8cbb-b6f9a5d0b6a1"
+        email:
+          type: string
+          example: "user@example.com"
+        phoneNumber:
+          type: string
+          example: "+1234567890"
+        name:
+          type: string
+          example: "John Doe"
+        address:
+          $ref: '#/components/schemas/Address'
+        password:
+          type: string
+          example: "securePassword123"
+        isVerified:
+          type: boolean
+          example: true
+
+    UserRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "user@example.com"
+        phoneNumber:
+          type: string
+          example: "+1234567890"
+        name:
+          type: string
+          example: "John Doe"
+        address:
+          $ref: '#/components/schemas/Address'
+        password:
+          type: string
+          example: "securePassword123"
+
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "user@example.com"
+        password:
+          type: string
+          example: "securePassword123"
+
+    UserUpdate:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          example: "+1234567890"
+        name:
+          type: string
+          example: "John Doe"
+        address:
+          $ref: '#/components/schemas/Address'
+
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "123 Main St"
+        city:
+          type: string
+          example: "Springfield"
+        state:
+          type: string
+          example: "IL"
+        zipCode:
+          type: string
+          example: "62701"

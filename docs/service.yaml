@@ -1,0 +1,238 @@
+components:
+  schemas:
+    Availability:
+      properties:
+        day:
+          description: Day of the week.
+          example: Monday
+          type: string
+        endTime:
+          description: End time of availability in HH:MM format.
+          example: '17:00'
+          format: time
+          type: string
+        startTime:
+          description: Start time of availability in HH:MM format.
+          example: 09:00
+          format: time
+          type: string
+      required:
+      - day
+      - startTime
+      - endTime
+      type: object
+    Error:
+      properties:
+        errorCode:
+          description: Error code identifier.
+          example: 400_BAD_REQUEST
+          type: string
+        message:
+          description: Error description.
+          example: Invalid input data provided.
+          type: string
+      type: object
+    Service:
+      properties:
+        basePrice:
+          description: Base price of the service.
+          example: 50.0
+          format: float
+          type: number
+        category:
+          description: Service category.
+          example: Electrical
+          type: string
+        description:
+          description: Detailed description of the service.
+          example: Fix faulty wiring in homes or offices
+          type: string
+        estimatedDuration:
+          description: Estimated duration of the service in ISO 8601 format.
+          example: PT1H30M
+          format: duration
+          type: string
+        name:
+          description: Name of the service.
+          example: Wiring Repair
+          type: string
+        requirements:
+          description: List of requirements for the service.
+          example:
+          - Access to main power supply
+          items:
+            type: string
+          type: array
+      required:
+      - name
+      - description
+      - category
+      - basePrice
+      - estimatedDuration
+      type: object
+    ServiceProviderRegistration:
+      properties:
+        availability:
+          description: Weekly availability schedule.
+          items:
+            $ref: '#/components/schemas/Availability'
+          type: array
+        email:
+          description: Email address of the provider.
+          example: johndoe@example.com
+          format: email
+          type: string
+        name:
+          description: Full name of the service provider.
+          example: John Doe
+          type: string
+        phoneNumber:
+          description: Contact phone number of the provider.
+          example: '+1234567890'
+          type: string
+        profession:
+          description: Profession or primary service provided.
+          example: Electrician
+          type: string
+        services:
+          description: List of services offered by the provider.
+          items:
+            $ref: '#/components/schemas/Service'
+          type: array
+      required:
+      - name
+      - profession
+      - email
+      - phoneNumber
+      - services
+      - availability
+      type: object
+    ServiceProviderResponse:
+      properties:
+        message:
+          description: Confirmation message.
+          example: Service provider registered successfully.
+          type: string
+        providerId:
+          description: Unique identifier for the registered service provider.
+          example: c1a1d7b3-2f5a-4b6a-bd1a-f0b6f3e3e7a1
+          format: uuid
+          type: string
+      type: object
+info:
+  description: API for managing service providers on the ServiceSync platform.
+  title: ServiceSync - Service Provider Management API
+  version: 1.0.0
+openapi: 3.0.0
+paths:
+  /api/providers:
+    get:
+      description: Retrieve a list of all service providers registered on the platform.
+      operationId: listProviders
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ServiceProviderResponse'
+                type: array
+          description: List of service providers
+        '500':
+          description: Internal server error
+      summary: List all service providers
+      tags:
+      - Service Provider Management
+    post:
+      description: Endpoint to register a new service provider on the ServiceSync
+        platform.
+      operationId: registerProvider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceProviderRegistration'
+        required: true
+      responses:
+        '201':
+          description: Provider registered successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+      summary: Register a new service provider
+      tags:
+      - Service Provider Management
+  /api/providers/{providerId}:
+    delete:
+      description: Remove a service provider from the platform.
+      operationId: deleteProvider
+      parameters:
+      - description: Unique ID of the service provider
+        in: path
+        name: providerId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Service provider deleted successfully
+        '404':
+          description: Service provider not found
+        '500':
+          description: Internal server error
+      summary: Delete a service provider
+      tags:
+      - Service Provider Management
+    get:
+      description: Retrieve details of a specific service provider using their unique
+        ID.
+      operationId: getProviderById
+      parameters:
+      - description: Unique ID of the service provider
+        in: path
+        name: providerId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          description: Service provider details
+        '404':
+          description: Service provider not found
+        '500':
+          description: Internal server error
+      summary: Get a service provider by ID
+      tags:
+      - Service Provider Management
+    put:
+      description: Update information for an existing service provider.
+      operationId: updateProvider
+      parameters:
+      - description: Unique ID of the service provider
+        in: path
+        name: providerId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceProviderRegistration'
+        required: true
+      responses:
+        '200':
+          description: Service provider updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Service provider not found
+        '500':
+          description: Internal server error
+      summary: Update a service provider's details
+      tags:
+      - Service Provider Management
